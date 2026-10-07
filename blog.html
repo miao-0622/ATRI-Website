@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATRI喵</title>
+  <meta name="description" content="我写过的一些文章。" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</head>
+
+<body data-page="blog">
+  <div id="siteBackground" class="site-background" aria-hidden="true"></div>
+  <button class="theme-fab" id="themeToggle" type="button" aria-label="切换主题">🌙</button>
+
+  <div class="page">
+    <!-- is-two-col：子页面用两列（左导航 + 右内容） -->
+    <div class="bento is-two-col">
+      <div class="col col-left">
+        <aside class="card card-profile" data-profile-card></aside>
+      </div>
+
+      <div class="col col-main">
+        <header class="page-head">
+          <h1 class="page-title">近期文章</h1>
+          <p class="page-desc">按时间从新到旧排列。加新文章只要改 assets/js/data.js 里的 posts。</p>
+        </header>
+
+        <!-- 列表内容由 main.js 自动按 data.js 的 posts 生成 -->
+        <div class="list-stack" data-list="posts"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>© <span id="year">2026</span> <span id="footerName">我</span> · 用 HTML / CSS / JavaScript 手写</p>
+    </footer>
+  </div>
+</body>
+</html>

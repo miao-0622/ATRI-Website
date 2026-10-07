@@ -1,0 +1,868 @@
+/* =========================================================
+   个人网站 · 样式表
+   变量集中在下面两处：背景、主题色。改这两个地方基本就够用了。
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   背景：底色 + 一张背景图 + 一层半透明遮罩
+   换背景图：改 --bg-image 里的 url
+   图太抢眼 / 文字看不清：调大 --bg-scrim 最后一个数字（0~1）
+   不想要图片：把 --bg-image 整行删掉，只剩底色和光晕
+   --------------------------------------------------------- */
+:root {
+  --bg-base: #eef7f2;
+
+  /* 遮罩：盖在背景图上，让卡片上的文字好读 */
+  --bg-scrim: rgba(255, 255, 255, 0.64);
+
+  /* 背景图（想换成整张图就改这里的 url） */
+  --bg-image: linear-gradient(var(--bg-scrim), var(--bg-scrim)),
+    url("../images/backgrounds/background.jpg");
+
+  /* fixed = 背景固定不动，scroll = 跟着页面滚 */
+  --bg-attachment: fixed;
+
+  /* 没有背景图时的柔光色块 */
+  --bg-blob-1: rgba(150, 226, 199, 0.9);
+  --bg-blob-2: rgba(186, 213, 255, 0.85);
+  --bg-blob-3: rgba(255, 205, 226, 0.85);
+  --bg-blob-4: rgba(222, 205, 255, 0.8);
+}
+
+
+/* =========================================================
+   第 2 部分：主题色 / 卡片外观
+   改完背景想微调卡片，就改这里的值。
+   ========================================================= */
+:root {
+  /* 卡片 */
+  --card-bg: rgba(255, 255, 255, 0.84);
+  --card-bg-strong: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 10px 30px rgba(78, 122, 140, 0.13);
+  --card-shadow-hover: 0 16px 40px rgba(78, 122, 140, 0.2);
+  --radius-card: 26px;
+  --radius-small: 16px;
+
+  /* 文字 */
+  --text: #26313a;
+  --text-muted: #5d6b76;
+  --text-faint: #8b98a3;
+
+  /* 强调色（参考站里"写文章"按钮、日历今天的方块都是这个青绿色） */
+  --accent: #2fbfa8;
+  --accent-soft: rgba(47, 191, 168, 0.16);
+  --accent-text: #ffffff;
+
+  /* 时钟卡片的配色（深底浅字） */
+  --clock-bg: rgba(38, 45, 56, 0.88);
+  --clock-text: #e8f6f2;
+
+  /* 布局 */
+  --page-max: 1240px;
+  --col-left: 274px;
+  --col-right: 306px;
+  --gap: 18px;
+}
+
+/* 暗色主题（右上角按钮切换）：遮罩换成深色，压住背景图 */
+html[data-theme="dark"] {
+  --bg-base: #0f141b;
+  --bg-scrim: rgba(10, 14, 20, 0.64);
+  --bg-blob-1: rgba(24, 92, 84, 0.75);
+  --bg-blob-2: rgba(30, 58, 104, 0.7);
+  --bg-blob-3: rgba(96, 40, 74, 0.7);
+  --bg-blob-4: rgba(56, 40, 96, 0.7);
+
+  --card-bg: rgba(28, 36, 46, 0.8);
+  --card-bg-strong: rgba(30, 39, 50, 0.94);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.45);
+
+  --text: #e7eaf0;
+  --text-muted: #9aa7b4;
+  --text-faint: #7b8896;
+
+  --accent: #3ed0b6;
+  --accent-soft: rgba(62, 208, 182, 0.16);
+
+  --clock-bg: rgba(12, 16, 22, 0.9);
+  --clock-text: #d8f6ef;
+}
+
+
+/* =========================================================
+   第 3 部分：基础样式
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: color 0.35s ease;
+
+  /* 背景：底色 + 背景图（含遮罩）+ 光晕 */
+  background-color: var(--bg-base);
+  background-image: var(--bg-image),
+    radial-gradient(circle at 8% 12%, var(--bg-blob-1) 0%, transparent 45%),
+    radial-gradient(circle at 92% 6%, var(--bg-blob-2) 0%, transparent 42%),
+    radial-gradient(circle at 88% 92%, var(--bg-blob-3) 0%, transparent 45%),
+    radial-gradient(circle at 6% 88%, var(--bg-blob-4) 0%, transparent 45%);
+  background-attachment: var(--bg-attachment);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 全屏背景图层（默认全透明，保留给以后做背景图轮换用） */
+.site-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   第 4 部分：页面骨架 + 三列布局
+   ---------------------------------------------------------
+   首页是"三列"：左列 profile，中列 main，右列 side。
+   想把某张卡片从一列挪到另一列？在 index.html 里把那个
+   <section> 整块剪切到另一个 <div class="col"> 里就行，
+   顺序就是上下的顺序。
+   ========================================================= */
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 28px 22px 48px;
+}
+
+.bento {
+  display: grid;
+  grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-right);
+  gap: var(--gap);
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* 右上角悬浮的主题切换按钮 */
+.theme-fab {
+  position: fixed;
+  top: 18px;
+  right: 20px;
+  z-index: 50;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  background: var(--card-bg-strong);
+  box-shadow: var(--card-shadow);
+  font-size: 18px;
+  line-height: 1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* 子页面用两列：左导航 + 右内容（在页面里给 .bento 加上 is-two-col） */
+.bento.is-two-col {
+  grid-template-columns: var(--col-left) minmax(0, 1fr);
+}
+
+/* 页脚 */
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 12.5px;
+}
+
+.footer p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   第 5 部分：卡片通用外观
+   所有卡片都带 .card。想统一改圆角/阴影，改第 2 部分的变量。
+   ========================================================= */
+.card {
+  position: relative;
+  padding: 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    background-color 0.35s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* 卡片里的小标题，例如"最新文章""随机推荐" */
+.card-label {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+
+
+/* =========================================================
+   第 6 部分：各个卡片
+   ========================================================= */
+
+/* ---------- 6.1 个人卡（头像 + 名字 + 导航菜单） ---------- */
+.card-profile {
+  padding: 22px 18px;
+}
+
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.profile-head:hover {
+  background: var(--accent-soft);
+}
+
+.profile-avatar {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--card-bg-strong);
+}
+
+.profile-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.profile-status {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.profile-sub {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+
+/* 导航菜单（近期文章 / 我的项目 / …） */
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  color: var(--text-muted);
+  font-size: 14.5px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* 当前所在页面高亮 */
+.nav-item.is-active {
+  background: var(--card-bg-strong);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(78, 122, 140, 0.12);
+}
+
+.nav-icon {
+  width: 20px;
+  flex: none;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* ---------- 6.2 贴纸装饰卡 ---------- */
+.card-stickers {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+}
+
+.polaroid {
+  width: 88px;
+  height: 98px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 4px solid #fff;
+  background: linear-gradient(150deg, #ffe6f1, #dff5ec 60%, #e6ecff);
+  box-shadow: 0 6px 18px rgba(78, 122, 140, 0.16);
+  font-size: 34px;
+  transition: transform 0.25s ease;
+}
+
+.polaroid:nth-child(1) {
+  transform: rotate(-7deg) translateY(4px);
+}
+.polaroid:nth-child(2) {
+  transform: rotate(3deg) translateY(-4px);
+}
+.polaroid:nth-child(3) {
+  transform: rotate(8deg) translateY(5px);
+}
+
+.card-stickers:hover .polaroid:nth-child(1) {
+  transform: rotate(-10deg) translateY(0);
+}
+.card-stickers:hover .polaroid:nth-child(2) {
+  transform: rotate(0deg) translateY(-8px);
+}
+.card-stickers:hover .polaroid:nth-child(3) {
+  transform: rotate(11deg) translateY(1px);
+}
+
+/* ---------- 6.3 问候卡（含吉祥物 / live2d 位置） ---------- */
+.card-greeting {
+  padding: 26px 20px 30px;
+  text-align: center;
+}
+
+.mascot {
+  width: 108px;
+  height: 108px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, #fff6c9, #ffe9a8);
+  font-size: 50px;
+  box-shadow: 0 8px 22px rgba(214, 190, 90, 0.28);
+}
+
+.greeting-text {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.greeting-text .hi {
+  color: var(--accent);
+}
+
+/* ---------- 6.4 写文章按钮 ---------- */
+.card-write {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  border-radius: 18px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(47, 191, 168, 0.32);
+}
+
+.card-write:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+}
+
+/* ---------- 6.5 数字时钟 ---------- */
+.card-clock {
+  padding: 18px 20px;
+  background: var(--clock-bg);
+  border-color: transparent;
+  text-align: center;
+}
+
+.clock-time {
+  color: var(--clock-text);
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", "SFMono-Regular",
+    monospace;
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-shadow: 0 0 16px rgba(120, 240, 210, 0.35);
+}
+
+.clock-date {
+  margin-top: 4px;
+  color: rgba(232, 246, 242, 0.6);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- 6.6 日历 ---------- */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cal-today {
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.cal-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.cal-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.cal-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-weekday {
+  padding-bottom: 4px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+}
+
+.cal-day {
+  padding: 6px 0;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.cal-day.is-today {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(47, 191, 168, 0.35);
+}
+
+.cal-day.is-empty {
+  visibility: hidden;
+}
+
+/* ---------- 6.7 文章 / 推荐 小卡片（带缩略图） ---------- */
+.thumb-row {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #dff5ec, #e6ecff 70%, #ffe6f1);
+  font-size: 24px;
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-title {
+  margin: 0 0 4px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.thumb-desc {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.thumb-meta {
+  margin-top: 6px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+}
+
+.thumb-row:hover .thumb-title {
+  color: var(--accent);
+}
+
+/* ---------- 6.8 社交按钮排 ---------- */
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 12px;
+  background: #24292e;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(36, 41, 46, 0.22);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
+
+.social-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.social-btn.is-bilibili {
+  background: #fb7299;
+  box-shadow: 0 6px 16px rgba(251, 114, 153, 0.3);
+}
+
+.social-btn.is-xhs {
+  background: #ff2442;
+  box-shadow: 0 6px 16px rgba(255, 36, 66, 0.28);
+}
+
+.social-btn.is-csdn {
+  background: #fc5531;
+  box-shadow: 0 6px 16px rgba(252, 85, 49, 0.3);
+}
+
+.social-btn.is-mail {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: none;
+}
+
+/* ---------- 6.9 音乐播放器 ---------- */
+.card-music {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.music-note {
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.music-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-bar {
+  height: 4px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  overflow: hidden;
+}
+
+.music-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.25s linear;
+}
+
+.music-play {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 13px;
+}
+
+.music-hint {
+  margin-top: 5px;
+  color: var(--text-faint);
+  font-size: 11px;
+}
+
+/* ---------- 6.10 点赞 / 计数 ---------- */
+.card-like {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 13.5px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.card-like:hover {
+  transform: translateY(-3px);
+}
+
+.card-like.is-liked {
+  color: #ff5f8a;
+}
+
+.like-heart {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.card-like.is-liked .like-heart {
+  transform: scale(1.2);
+}
+
+
+/* =========================================================
+   第 7 部分：子页面（文章 / 项目 / 关于 / 分享 / 博客）
+   ========================================================= */
+.page-head {
+  margin: 2px 0 20px;
+}
+
+.page-title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.page-desc {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.card-list-item {
+  display: block;
+}
+
+/* 文章正文（关于页面用） */
+.prose {
+  max-width: 68ch;
+}
+
+.prose h2 {
+  margin: 26px 0 10px;
+  font-size: 18px;
+}
+
+.prose p {
+  margin: 0 0 13px;
+  color: var(--text-muted);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   第 8 部分：响应式
+   ========================================================= */
+@media (max-width: 1080px) {
+  .bento {
+    grid-template-columns: var(--col-left) minmax(0, 1fr);
+  }
+
+  /* 右列挪到下面，变成整行 */
+  .col-right {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 16px 14px 34px;
+  }
+
+  .bento {
+    grid-template-columns: 1fr;
+  }
+
+  .col-right {
+    display: flex;
+  }
+
+  .clock-time {
+    font-size: 36px;
+  }
+
+  .theme-fab {
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+  }
+}
+
+
+/* =========================================================
+   第 9 部分：尊重系统的"减少动效"设置
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

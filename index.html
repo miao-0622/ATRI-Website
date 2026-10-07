@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ===== 网页标签页标题 / 搜索信息（替换成你的） ===== -->
+  <title>ATRI喵</title>
+  <meta name="description" content="我的个人主页：文章、项目、推荐分享都在这里。" />
+  <meta name="author" content="ATRI喵" />
+  <meta name="theme-color" content="#eef7f2" />
+
+  <!-- ===== 样式表 ===== -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <!-- ===== 数据配置（改内容去这里）===== -->
+  <script src="assets/js/data.js"></script>
+  <!-- ===== 脚本（放在 head 里，为了在渲染前就应用主题，避免闪烁）===== -->
+  <script src="assets/js/main.js"></script>
+</head>
+
+<!-- data-page="home" 表示这是首页（用来决定导航菜单里哪一项高亮） -->
+<body data-page="home">
+
+  <!-- 背景图层（默认全透明，留给以后做背景图轮换用） -->
+  <div id="siteBackground" class="site-background" aria-hidden="true"></div>
+
+  <!-- 右上角主题切换按钮 -->
+  <button class="theme-fab" id="themeToggle" type="button" aria-label="切换主题">🌙</button>
+
+  <div class="page">
+    <!-- 三列布局：左（个人卡 / 最新文章）· 中（贴纸 / 问候 / 社交）· 右（时钟 / 日历 / 音乐 / 点赞）
+         想挪卡片的顺序，把对应的 <section> 整块剪切到另一个 <div class="col"> 里就行。 -->
+    <div class="bento">
+
+      <!-- ================= 左列 ================= -->
+      <div class="col col-left">
+        <aside class="card card-profile" data-profile-card></aside>
+
+        <!-- 最新文章，取 data.js 里 posts 的第 1 篇 -->
+        <section class="card" id="latestCard"></section>
+      </div>
+
+      <!-- ================= 中列 ================= -->
+      <div class="col col-main">
+        <!-- 贴纸装饰卡（emoji 占位；换成图片就把 div.polaroid 换成 img.polaroid） -->
+        <section class="card card-stickers" aria-hidden="true">
+          <div class="polaroid">🐱</div>
+          <div class="polaroid">🎧</div>
+          <div class="polaroid">🌸</div>
+        </section>
+
+        <!-- 问候卡：吉祥物 + 按时间自动切换的问候语 -->
+        <section class="card card-greeting" id="greetingCard"></section>
+
+        <!-- 社交按钮，内容来自 data.js 的 social -->
+        <div class="social-row" id="socialRow"></div>
+      </div>
+
+      <!-- ============ 右列 ============ -->
+      <div class="col col-right">
+        <!-- 写文章按钮，指向文章页 -->
+        <a class="card-write" href="blog.html">
+          <span aria-hidden="true">✏️</span><span>写文章</span>
+        </a>
+
+        <!-- 数字时钟 -->
+        <section class="card card-clock">
+          <div class="clock-time" id="clockTime">--:--</div>
+          <div class="clock-date" id="clockDate"></div>
+        </section>
+
+        <!-- 日历（可翻月，今天会高亮） -->
+        <section class="card" id="calendar"></section>
+
+        <!-- 点赞 / 访问计数 -->
+        <button class="card-like" id="likeCard" type="button"></button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>© <span id="year">2026</span> <span id="footerName">ATRI喵</span> · 用 HTML / CSS / JavaScript 手写</p>
+    </footer>
+  </div>
+</body>
+</html>

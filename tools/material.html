@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ATRI喵</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 26px 18px 60px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.65; color: #26313a;
+    background-color: #eef7f2;
+    background-image:
+      linear-gradient(rgba(255,255,255,.62), rgba(255,255,255,.62)),
+      radial-gradient(circle at 8% 10%, rgba(150,226,199,.9) 0%, transparent 45%),
+      radial-gradient(circle at 92% 8%, rgba(186,213,255,.85) 0%, transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(255,205,226,.85) 0%, transparent 45%),
+      radial-gradient(circle at 6% 88%, rgba(222,205,255,.8) 0%, transparent 45%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
+  .top h1 { margin: 0; font-size: 22px; }
+  .top a { color: #2fbfa8; text-decoration: none; font-size: 14px; }
+  .top a:hover { text-decoration: underline; }
+  .card {
+    padding: 22px; margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.95); border-radius: 24px;
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 10px 30px rgba(78,122,140,.13);
+  }
+  .card > h2 { margin: 0 0 4px; font-size: 16px; }
+  .card > p.hint { margin: 0 0 18px; font-size: 13px; color: #5d6b76; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5d6b76; }
+  input, select {
+    width: 100%; padding: 9px 12px; font: inherit; font-size: 14px; color: #26313a;
+    border: 1px solid rgba(120,150,165,.28); border-radius: 12px; background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid #2fbfa8; outline-offset: 1px; }
+  .row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; font-size: 14px; }
+  .row + .row { border-top: 1px solid rgba(120,150,165,.14); }
+  .row span:first-child { color: #5d6b76; }
+  .row span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .big span:last-child { font-size: 18px; color: #1d8b7a; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+  th, td { padding: 7px 8px; text-align: left; border-bottom: 1px solid rgba(120,150,165,.16); }
+  th { color: #5d6b76; font-weight: 600; font-size: 13px; }
+  td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+  .note { font-size: 12.5px; color: #8b98a3; line-height: 1.7; }
+  .note code { background: rgba(120,150,165,.14); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>材料理论重量计算器</h1>
+    <a href="../index.html">← 返回首页</a>
+  </div>
+
+  <div class="card">
+    <h2>输入参数</h2>
+    <p class="hint">按外形尺寸算理论重量（不含加工余量和公差影响），用于备料估算。</p>
+
+    <div class="grid">
+      <label class="field">形状
+        <select id="shape">
+          <option value="round">圆钢 / 圆棒</option>
+          <option value="square">方钢</option>
+          <option value="plate">钢板</option>
+          <option value="pipe">圆管</option>
+          <option value="hex">六角棒（对边距）</option>
+        </select>
+      </label>
+      <label class="field">材料
+        <select id="material"></select>
+      </label>
+      <label class="field">自定义密度（g/cm³，可留空）
+        <input id="customDensity" type="number" min="0.1" step="0.01" placeholder="留空则用上面选的材料" />
+      </label>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+      <label class="field" id="wrapA">直径 / 边长 / 厚度 a（mm）
+        <input id="dima" type="number" min="0" step="0.1" value="20" />
+      </label>
+      <label class="field" id="wrapB" style="display:none">宽度 b（mm）
+        <input id="dimb" type="number" min="0" step="0.1" value="100" />
+      </label>
+      <label class="field" id="wrapC" style="display:none">内径 / 内孔（mm）
+        <input id="dimc" type="number" min="0" step="0.1" value="10" />
+      </label>
+      <label class="field">长度 / 高度 L（mm）
+        <input id="length" type="number" min="0" step="1" value="1000" />
+      </label>
+      <label class="field">件数
+        <input id="count" type="number" min="1" step="1" value="1" />
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>计算结果</h2>
+    <div id="out"></div>
+  </div>
+
+  <div class="card">
+    <h2>常用材料密度（g/cm³）</h2>
+    <table>
+      <thead><tr><th>材料</th><th>密度</th><th>材料</th><th>密度</th></tr></thead>
+      <tbody id="densityTable"></tbody>
+    </table>
+    <p class="note" style="margin-top:14px">
+      重量 = 体积 × 密度。密度取常见牌号的近似值，精确计算请按具体牌号或实测值填写"自定义密度"。<br />
+      圆钢可按 <code>0.00617 × d²</code>（kg/m，d 单位 mm）快速估算。
+    </p>
+  </div>
+
+</div>
+
+<script>
+// 材料密度表（g/cm³，常见牌号近似值）
+var MATERIALS = [
+  { name: "碳素钢 / 低合金钢", density: 7.85 },
+  { name: "不锈钢（304/316）", density: 7.93 },
+  { name: "灰铸铁", density: 7.2 },
+  { name: "球墨铸铁", density: 7.3 },
+  { name: "铝合金", density: 2.7 },
+  { name: "纯铜", density: 8.96 },
+  { name: "黄铜", density: 8.5 },
+  { name: "钛合金（TC4）", density: 4.43 },
+  { name: "镁合金", density: 1.8 },
+  { name: "尼龙 PA6", density: 1.15 },
+  { name: "POM（赛钢）", density: 1.41 },
+  { name: "亚克力 PMMA", density: 1.19 }
+];
+
+var DENSITY_REF = [
+  ["碳素钢 / 低合金钢", "7.85", "纯铜", "8.96"],
+  ["不锈钢（304/316）", "7.93", "黄铜", "8.50"],
+  ["灰铸铁", "7.20", "钛合金（TC4）", "4.43"],
+  ["球墨铸铁", "7.30", "镁合金", "1.80"],
+  ["铝合金", "2.70", "尼龙 PA6", "1.15"],
+  ["工业纯铁", "7.87", "亚克力 PMMA", "1.19"]
+];
+
+function readNumber(id) {
+  var v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
+}
+
+function f(value, digits) {
+  if (value === null || !isFinite(value)) return "—";
+  return value.toFixed(digits === undefined ? 3 : digits);
+}
+
+function syncFields() {
+  var shape = document.getElementById("shape").value;
+  // 只有钢板（厚×宽×长）、圆管（外径/内径）需要第二、第三个尺寸
+  document.getElementById("wrapB").style.display = shape === "plate" ? "" : "none";
+  document.getElementById("wrapC").style.display = shape === "pipe" ? "" : "none";
+
+  var labelA = {
+    round: "直径 d（mm）",
+    square: "边长 a（mm）",
+    plate: "厚度 t（mm）",
+    pipe: "外径 D（mm）",
+    hex: "对边距 s（mm）"
+  }[shape];
+  document.getElementById("wrapA").childNodes[0].nodeValue = labelA + " ";
+}
+
+function calc() {
+  syncFields();
+
+  var shape = document.getElementById("shape").value;
+  var materialIndex = parseInt(document.getElementById("material").value, 10) || 0;
+  var custom = readNumber("customDensity");
+  var density = custom !== null && custom > 0 ? custom : MATERIALS[materialIndex].density;
+
+  var a = readNumber("dima");
+  var b = readNumber("dimb");
+  var c = readNumber("dimc");
+  var L = readNumber("length");
+  var count = readNumber("count");
+  var out = document.getElementById("out");
+
+  if (!(a > 0) || !(L > 0)) {
+    out.innerHTML = '<p class="note">尺寸请填正数。</p>';
+    return;
+  }
+  if (shape === "plate" && !(b > 0)) {
+    out.innerHTML = '<p class="note">钢板需要填宽度 b。</p>';
+    return;
+  }
+  if (shape === "pipe" && !(c >= 0 && c < a)) {
+    out.innerHTML = '<p class="note">圆管的内径要小于外径。</p>';
+    return;
+  }
+
+  // 截面积（mm²）
+  var area;
+  if (shape === "round") area = (Math.PI / 4) * a * a;
+  else if (shape === "square") area = a * a;
+  else if (shape === "plate") area = a * b;
+  else if (shape === "pipe") area = (Math.PI / 4) * (a * a - c * c);
+  else area = (Math.sqrt(3) / 2) * a * a; // 六角棒：对边距 s → 面积 = √3/2 · s²
+
+  var volumeMm3 = area * L;
+  var volumeCm3 = volumeMm3 / 1000;
+  var weightPerPiece = (volumeCm3 * density) / 1000; // kg
+  var pieces = count !== null && count >= 1 ? Math.round(count) : 1;
+  var total = weightPerPiece * pieces;
+  var perMeter = (weightPerPiece * 1000) / L;
+
+  function row(label, value, big) {
+    return '<div class="row' + (big ? " big" : "") + '"><span>' + label + '</span><span>' + value + "</span></div>";
+  }
+
+  out.innerHTML =
+    row("材料 / 密度", MATERIALS[materialIndex].name.replace(/\s*\/.*/, "") + "　" + f(density, 2) + " g/cm³") +
+    row("截面积", f(area, 2) + " mm²") +
+    row("体积", f(volumeCm3, 2) + " cm³") +
+    row("每米重量", f(perMeter, 3) + " kg/m") +
+    row("单件重量", f(weightPerPiece, 3) + " kg", true) +
+    (pieces > 1 ? row("合计（" + pieces + " 件）", f(total, 3) + " kg", true) : "");
+}
+
+(function init() {
+  var options = MATERIALS.map(function (m, i) {
+    return '<option value="' + i + '">' + m.name + "　" + m.density + "</option>";
+  }).join("");
+  document.getElementById("material").innerHTML = options;
+
+  document.getElementById("densityTable").innerHTML = DENSITY_REF.map(function (r) {
+    return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>";
+  }).join("");
+
+  ["shape", "material", "customDensity", "dima", "dimb", "dimc", "length", "count"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", calc);
+    document.getElementById(id).addEventListener("change", calc);
+  });
+
+  calc();
+})();
+</script>
+</body>
+</html>

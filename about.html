@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATRI喵</title>
+  <meta name="description" content="关于我，以及这个网站是怎么做的。" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</head>
+
+<body data-page="about">
+  <div id="siteBackground" class="site-background" aria-hidden="true"></div>
+  <button class="theme-fab" id="themeToggle" type="button" aria-label="切换主题">🌙</button>
+
+  <div class="page">
+    <div class="bento is-two-col">
+      <div class="col col-left">
+        <aside class="card card-profile" data-profile-card></aside>
+      </div>
+
+      <div class="col col-main">
+        <header class="page-head">
+          <h1 class="page-title"></h1>
+          <p class="page-desc"></p>
+        </header>
+
+        <!-- 自我介绍：内容来自 data.js 的 about -->
+        <section class="card prose" id="aboutIntro" style="margin-bottom: 18px"></section>
+
+        <!-- 网站是怎么做的：内容来自 data.js 的 about.siteBody -->
+        <section class="card prose" id="aboutSite" style="margin-bottom: 18px"></section>
+
+        <!-- 联系我 -->
+        <section class="card">
+          <p class="card-label" id="contactLabel"></p>
+          <div class="social-row" id="socialRow" style="justify-content: flex-start"></div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>© <span id="year">2026</span> <span id="footerName">我</span> · 用 HTML / CSS / JavaScript 手写</p>
+    </footer>
+  </div>
+</body>
+</html>

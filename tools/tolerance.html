@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ATRI喵</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 26px 18px 60px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.65; color: #26313a;
+    background-color: #eef7f2;
+    background-image:
+      linear-gradient(rgba(255,255,255,.62), rgba(255,255,255,.62)),
+      radial-gradient(circle at 8% 10%, rgba(150,226,199,.9) 0%, transparent 45%),
+      radial-gradient(circle at 92% 8%, rgba(186,213,255,.85) 0%, transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(255,205,226,.85) 0%, transparent 45%),
+      radial-gradient(circle at 6% 88%, rgba(222,205,255,.8) 0%, transparent 45%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
+  .top h1 { margin: 0; font-size: 22px; }
+  .top a { color: #2fbfa8; text-decoration: none; font-size: 14px; }
+  .top a:hover { text-decoration: underline; }
+  .card {
+    padding: 22px; margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.95); border-radius: 24px;
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 10px 30px rgba(78,122,140,.13);
+  }
+  .card > h2 { margin: 0 0 4px; font-size: 16px; }
+  .card > p.hint { margin: 0 0 18px; font-size: 13px; color: #5d6b76; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5d6b76; }
+  input, select {
+    width: 100%; padding: 9px 12px; font: inherit; font-size: 14px; color: #26313a;
+    border: 1px solid rgba(120,150,165,.28); border-radius: 12px; background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid #2fbfa8; outline-offset: 1px; }
+  .out { margin-top: 18px; padding-top: 16px; border-top: 1px dashed rgba(120,150,165,.32); }
+  .row { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; font-size: 14px; }
+  .row + .row { border-top: 1px solid rgba(120,150,165,.14); }
+  .row span:first-child { color: #5d6b76; }
+  .row span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .big { font-size: 17px; }
+  .anno {
+    display: inline-block; margin-top: 6px; padding: 7px 16px;
+    border-radius: 12px; background: rgba(47,191,168,.14); color: #1d8b7a;
+    font-family: ui-monospace, Consolas, monospace; font-size: 17px; font-weight: 700;
+  }
+  .tag { display: inline-block; padding: 3px 11px; border-radius: 999px; background: rgba(47,191,168,.16); color: #1d8b7a; font-size: 12.5px; font-weight: 600; }
+  .note { font-size: 12.5px; color: #8b98a3; line-height: 1.7; }
+  .note code { background: rgba(120,150,165,.14); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>尺寸公差与配合计算器</h1>
+    <a href="../index.html">← 返回首页</a>
+  </div>
+
+  <!-- 单件公差 -->
+  <div class="card">
+    <h2>一、算公差、写标注</h2>
+    <p class="hint">填入公称尺寸和公差等级，给出标准公差值和上下偏差的标注写法。</p>
+
+    <div class="grid">
+      <label class="field">公称尺寸 D（mm）
+        <input id="nominal" type="number" min="0.1" max="500" step="0.1" value="50" />
+      </label>
+      <label class="field">公差等级
+        <select id="grade"></select>
+      </label>
+      <label class="field">基准件
+        <select id="basis">
+          <option value="H">孔 H（下偏差 = 0）</option>
+          <option value="h">轴 h（上偏差 = 0）</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="out" id="singleOut"></div>
+  </div>
+
+  <!-- 配合 -->
+  <div class="card">
+    <h2>二、算配合（间隙 / 过盈）</h2>
+    <p class="hint">孔用 H、轴用 h 的基准制配合。给出这对孔轴的最大最小间隙，并判断配合性质。</p>
+
+    <div class="grid">
+      <label class="field">公称尺寸 D（mm）
+        <input id="fitNominal" type="number" min="0.1" max="500" step="0.1" value="50" />
+      </label>
+      <label class="field">孔的公差等级
+        <select id="fitHole"></select>
+      </label>
+      <label class="field">轴的公差等级
+        <select id="fitShaft"></select>
+      </label>
+    </div>
+
+    <div class="out" id="fitOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>说明</h2>
+    <p class="note">
+      公差值取自 GB/T 1800.1（ISO 286-1）标准公差数值表，尺寸分段按标准的 13 段划分。<br />
+      本工具支持 <code>H</code> 孔 / <code>h</code> 轴两种基准件；其他基本偏差代号（f、g、k、n、p…）
+      的极限偏差需另查标准表。<br />
+      等级大致用途：IT5~IT6 量规、精密件 ｜ IT7~IT8 一般配合 ｜ IT9~IT11 一般机加工 ｜
+      IT12~IT14 粗加工 ｜ IT15~IT18 非配合尺寸。
+    </p>
+  </div>
+
+</div>
+
+<script>
+// 标准公差数值表（µm）：尺寸分段上限 → [IT5, IT6, ... IT18]
+var IT_TABLE = {
+  3:   [4, 6, 10, 14, 25, 40, 60, 100, 140, 250, 400, 600, 1000, 1400],
+  6:   [5, 8, 12, 18, 30, 48, 75, 120, 180, 300, 480, 750, 1200, 1800],
+  10:  [6, 9, 15, 22, 36, 58, 90, 150, 220, 360, 580, 900, 1500, 2200],
+  18:  [8, 11, 18, 27, 43, 70, 110, 180, 270, 430, 700, 1100, 1800, 2700],
+  30:  [9, 13, 21, 33, 52, 84, 130, 210, 330, 520, 840, 1300, 2100, 3300],
+  50:  [11, 16, 25, 39, 62, 100, 160, 250, 390, 620, 1000, 1600, 2500, 3900],
+  80:  [13, 19, 30, 46, 74, 120, 190, 300, 460, 740, 1200, 1900, 3000, 4600],
+  120: [15, 22, 35, 54, 87, 140, 220, 350, 540, 870, 1400, 2200, 3500, 5400],
+  180: [18, 25, 40, 63, 100, 160, 250, 400, 630, 1000, 1600, 2500, 4000, 6300],
+  250: [20, 29, 46, 72, 115, 185, 290, 460, 720, 1150, 1850, 2900, 4600, 7200],
+  315: [23, 32, 52, 81, 130, 210, 320, 520, 810, 1300, 2100, 3200, 5200, 8100],
+  400: [25, 36, 57, 89, 140, 230, 360, 570, 890, 1400, 2300, 3600, 5700, 8900],
+  500: [27, 40, 63, 97, 155, 250, 400, 630, 970, 1550, 2500, 4000, 6300, 9700]
+};
+
+var UPPER_LIMITS = [3, 6, 10, 18, 30, 50, 80, 120, 180, 250, 315, 400, 500];
+
+// 取某公称尺寸、某等级的标准公差值（µm）
+function itValue(nominal, grade) {
+  if (!(nominal > 0) || nominal > 500) return null;
+  for (var i = 0; i < UPPER_LIMITS.length; i++) {
+    if (nominal <= UPPER_LIMITS[i]) {
+      return IT_TABLE[UPPER_LIMITS[i]][grade - 5];
+    }
+  }
+  return null;
+}
+
+// 所属尺寸分段的文字描述
+function segmentText(nominal) {
+  var lower = 0;
+  for (var i = 0; i < UPPER_LIMITS.length; i++) {
+    if (nominal <= UPPER_LIMITS[i]) {
+      return lower === 0 ? "≤ " + UPPER_LIMITS[i] + " mm"
+                         : "> " + lower + " ~ " + UPPER_LIMITS[i] + " mm";
+    }
+    lower = UPPER_LIMITS[i];
+  }
+  return "—";
+}
+
+// µm → mm 文字（0 直接写 0，其余保留 3 位小数）
+function toMm(um) {
+  if (um === 0) return "0";
+  return (um / 1000).toFixed(3);
+}
+
+function signed(um) {
+  return (um > 0 ? "+" : "") + toMm(um);
+}
+
+function row(label, value, big) {
+  return '<div class="row' + (big ? " big" : "") + '"><span>' + label + '</span><span>' + value + "</span></div>";
+}
+
+function readNumber(id) {
+  var v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
+}
+
+function readGrade(id) {
+  return parseInt(document.getElementById(id).value, 10);
+}
+
+function calcSingle() {
+  var out = document.getElementById("singleOut");
+  var nominal = readNumber("nominal");
+  var grade = readGrade("grade");
+  var basis = document.getElementById("basis").value;
+  var it = itValue(nominal, grade);
+
+  if (it === null) {
+    out.innerHTML = '<p class="note">公称尺寸请填 0.1 ~ 500 之间的数值。</p>';
+    return;
+  }
+
+  var es, ei;
+  if (basis === "H") {
+    ei = 0;
+    es = it;
+  } else {
+    es = 0;
+    ei = -it;
+  }
+
+  var code = (basis === "H" ? "H" : "h") + grade;
+  var anno = "φ" + nominal + code + "(" + signed(es) + " / " + signed(ei) + ")";
+
+  out.innerHTML =
+    row("所属尺寸分段", segmentText(nominal)) +
+    row("标准公差值 IT" + grade, it + " µm　=　" + toMm(it) + " mm", true) +
+    row("公差带代号", basis === "H" ? "孔 " + code : "轴 " + code) +
+    row("上偏差 es / ES", signed(es) + " mm") +
+    row("下偏差 ei / EI", signed(ei) + " mm") +
+    '<div class="row"><span>标注写法</span><span><span class="anno">' + anno + "</span></span></div>";
+}
+
+function calcFit() {
+  var out = document.getElementById("fitOut");
+  var nominal = readNumber("fitNominal");
+  var gHole = readGrade("fitHole");
+  var gShaft = readGrade("fitShaft");
+  var itH = itValue(nominal, gHole);
+  var itS = itValue(nominal, gShaft);
+
+  if (itH === null || itS === null) {
+    out.innerHTML = '<p class="note">公称尺寸请填 0.1 ~ 500 之间的数值。</p>';
+    return;
+  }
+
+  // 孔 H：EI = 0，ES = +IT　｜　轴 h：es = 0，ei = -IT
+  var ES = itH, EI = 0;
+  var es = 0, ei = -itS;
+
+  var xMax = ES - ei;   // 最大间隙（正数表示有间隙）
+  var xMin = EI - es;   // 最小间隙（负数表示有过盈）
+
+  var kind, kindColor = "tag";
+  if (xMin >= 0) {
+    kind = "间隙配合";
+  } else if (xMax <= 0) {
+    kind = "过盈配合";
+  } else {
+    kind = "过渡配合";
+  }
+
+  function gapText(um) {
+    if (um >= 0) return "间隙 " + toMm(um) + " mm";
+    return "过盈 " + toMm(-um) + " mm";
+  }
+
+  out.innerHTML =
+    row("配合代号", "φ" + nominal + " H" + gHole + "/h" + gShaft, true) +
+    row("孔的极限偏差", signed(ES) + " / " + signed(EI) + " mm（IT" + gHole + " = " + itH + " µm）") +
+    row("轴的极限偏差", signed(es) + " / " + signed(ei) + " mm（IT" + gShaft + " = " + itS + " µm）") +
+    row("最大间隙 / 最小过盈", gapText(xMax)) +
+    row("最小间隙 / 最大过盈", gapText(xMin)) +
+    row("配合公差", toMm(xMax - xMin) + " mm") +
+    '<div class="row"><span>配合性质</span><span><span class="' + kindColor + '">' + kind + "</span></span></div>";
+}
+
+// 初始化下拉框（IT5 ~ IT18）
+(function init() {
+  var options = "";
+  for (var g = 5; g <= 18; g++) {
+    options += '<option value="' + g + '">IT' + g + "</option>";
+  }
+  document.getElementById("grade").innerHTML = options;
+  document.getElementById("fitHole").innerHTML = options;
+  document.getElementById("fitShaft").innerHTML = options;
+  document.getElementById("grade").value = "7";
+  document.getElementById("fitHole").value = "7";
+  document.getElementById("fitShaft").value = "6";
+
+  ["nominal", "grade", "basis"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", calcSingle);
+    document.getElementById(id).addEventListener("change", calcSingle);
+  });
+  ["fitNominal", "fitHole", "fitShaft"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", calcFit);
+    document.getElementById(id).addEventListener("change", calcFit);
+  });
+
+  calcSingle();
+  calcFit();
+})();
+</script>
+</body>
+</html>

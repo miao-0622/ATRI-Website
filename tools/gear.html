@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ATRI喵</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 26px 18px 60px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.65; color: #26313a;
+    background-color: #eef7f2;
+    background-image:
+      linear-gradient(rgba(255,255,255,.62), rgba(255,255,255,.62)),
+      radial-gradient(circle at 8% 10%, rgba(150,226,199,.9) 0%, transparent 45%),
+      radial-gradient(circle at 92% 8%, rgba(186,213,255,.85) 0%, transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(255,205,226,.85) 0%, transparent 45%),
+      radial-gradient(circle at 6% 88%, rgba(222,205,255,.8) 0%, transparent 45%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
+  .top h1 { margin: 0; font-size: 22px; }
+  .top a { color: #2fbfa8; text-decoration: none; font-size: 14px; }
+  .top a:hover { text-decoration: underline; }
+  .card {
+    padding: 22px; margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.95); border-radius: 24px;
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 10px 30px rgba(78,122,140,.13);
+  }
+  .card > h2 { margin: 0 0 4px; font-size: 16px; }
+  .card > p.hint { margin: 0 0 18px; font-size: 13px; color: #5d6b76; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #5d6b76; }
+  input, select {
+    width: 100%; padding: 9px 12px; font: inherit; font-size: 14px; color: #26313a;
+    border: 1px solid rgba(120,150,165,.28); border-radius: 12px; background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid #2fbfa8; outline-offset: 1px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 14px; }
+  th, td { padding: 9px 8px; text-align: right; border-bottom: 1px solid rgba(120,150,165,.16); font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; color: #5d6b76; font-variant-numeric: normal; }
+  thead th { color: #5d6b76; font-weight: 600; font-size: 13px; }
+  thead th:nth-child(2) { color: #1d8b7a; }
+  .note { font-size: 12.5px; color: #8b98a3; line-height: 1.7; }
+  .note code { background: rgba(120,150,165,.14); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>齿轮传动参数计算器</h1>
+    <a href="../index.html">← 返回首页</a>
+  </div>
+
+  <div class="card">
+    <h2>输入参数</h2>
+    <p class="hint">一对外啮合标准直齿圆柱齿轮。模数按标准系列取（1、1.25、1.5、2、2.5、3、4、5…）。</p>
+
+    <div class="grid">
+      <label class="field">模数 m（mm）
+        <input id="module" type="number" min="0.1" step="0.05" value="3" />
+      </label>
+      <label class="field">小齿轮齿数 z₁
+        <input id="z1" type="number" min="1" step="1" value="20" />
+      </label>
+      <label class="field">大齿轮齿数 z₂
+        <input id="z2" type="number" min="1" step="1" value="60" />
+      </label>
+      <label class="field">压力角 α（°）
+        <input id="alpha" type="number" min="10" max="30" step="0.5" value="20" />
+      </label>
+      <label class="field">齿顶高系数 hₐ*
+        <input id="ha" type="number" min="0.5" max="1.2" step="0.05" value="1" />
+      </label>
+      <label class="field">顶隙系数 c*
+        <input id="c" type="number" min="0" max="0.5" step="0.05" value="0.25" />
+      </label>
+      <label class="field">小齿轮转速 n₁（r/min，可留空）
+        <input id="n1" type="number" min="0" step="10" value="960" />
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>计算结果</h2>
+    <div id="out"></div>
+  </div>
+
+  <div class="card">
+    <h2>说明</h2>
+    <p class="note">
+      计算公式（标准直齿外啮合圆柱齿轮）：分度圆 <code>d = m·z</code>；齿顶圆 <code>dₐ = m(z + 2hₐ*)</code>；
+      齿根圆 <code>d_f = m(z − 2hₐ* − 2c*)</code>；基圆 <code>d_b = d·cos α</code>；中心距 <code>a = m(z₁ + z₂)/2</code>；
+      齿距 <code>p = πm</code>；圆周速度 <code>v = π·d·n / 60000</code>。<br />
+      20° 标准直齿轮不发生根切的最少齿数是 17 齿；负载较大时一般取 z₁ ≥ 20~25。
+    </p>
+  </div>
+
+</div>
+
+<script>
+function readNumber(id) {
+  var v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
+}
+
+function f(value, digits) {
+  if (value === null || !isFinite(value)) return "—";
+  return value.toFixed(digits === undefined ? 3 : digits);
+}
+
+function calc() {
+  var m = readNumber("module");
+  var z1 = readNumber("z1");
+  var z2 = readNumber("z2");
+  var alpha = readNumber("alpha");
+  var ha = readNumber("ha");
+  var c = readNumber("c");
+  var n1 = readNumber("n1");
+  var out = document.getElementById("out");
+
+  if (!(m > 0) || !(z1 >= 1) || !(z2 >= 1) || alpha === null || ha === null || c === null) {
+    out.innerHTML = '<p class="note">请把模数、齿数、压力角填成正数。</p>';
+    return;
+  }
+
+  var rad = (alpha * Math.PI) / 180;
+  var ratio = z2 / z1;
+
+  var d1 = m * z1, d2 = m * z2;
+  var da1 = m * (z1 + 2 * ha), da2 = m * (z2 + 2 * ha);
+  var df1 = m * (z1 - 2 * ha - 2 * c), df2 = m * (z2 - 2 * ha - 2 * c);
+  var db1 = d1 * Math.cos(rad), db2 = d2 * Math.cos(rad);
+  var a = (m * (z1 + z2)) / 2;
+  var p = Math.PI * m;
+  var h = m * (2 * ha + c);
+  var v1 = n1 !== null && n1 > 0 ? (Math.PI * d1 * n1) / 60000 : null;
+  var n2 = n1 !== null && n1 > 0 ? n1 / ratio : null;
+
+  function tr(name, unit, v1v, v2v, digits) {
+    return "<tr><td>" + name + (unit ? "（" + unit + "）" : "") + "</td><td>" +
+      f(v1v, digits) + "</td><td>" + f(v2v, digits) + "</td></tr>";
+  }
+
+  var html =
+    '<table><thead><tr><th>参数</th><th>小齿轮（z₁ = ' + z1 + "）</th><th>大齿轮（z₂ = " + z2 + "）</th></tr></thead><tbody>" +
+    tr("分度圆直径 d", "mm", d1, d2) +
+    tr("齿顶圆直径 dₐ", "mm", da1, da2) +
+    tr("齿根圆直径 d_f", "mm", df1, df2) +
+    tr("基圆直径 d_b", "mm", db1, db2) +
+    "</tbody></table>";
+
+  html +=
+    '<table><tbody>' +
+    '<tr><td>传动比 i = z₂ / z₁</td><td colspan="2">' + f(ratio, 4) + "</td></tr>" +
+    '<tr><td>标准中心距 a</td><td colspan="2">' + f(a) + " mm</td></tr>" +
+    '<tr><td>齿距 p = πm</td><td colspan="2">' + f(p) + " mm</td></tr>" +
+    '<tr><td>全齿高 h</td><td colspan="2">' + f(h) + " mm</td></tr>" +
+    '<tr><td>齿顶高 hₐ / 齿根高 h_f</td><td colspan="2">' + f(m * ha) + " / " + f(m * (ha + c)) + " mm</td></tr>" +
+    '<tr><td>小齿轮圆周速度 v₁</td><td colspan="2">' + (v1 === null ? "—（未填转速）" : f(v1, 2) + " m/s") + "</td></tr>" +
+    '<tr><td>大齿轮转速 n₂</td><td colspan="2">' + (n2 === null ? "—" : f(n2, 1) + " r/min") + "</td></tr>" +
+    '</tbody></table>';
+
+  if (z1 < 17) {
+    html += '<p class="note" style="margin-top:14px;color:#c2603a">提示：z₁ = ' + z1 +
+      " 小于 17 齿，标准直齿轮会有根切风险，一般需要变位。</p>";
+  }
+
+  out.innerHTML = html;
+}
+
+["module", "z1", "z2", "alpha", "ha", "c", "n1"].forEach(function (id) {
+  document.getElementById(id).addEventListener("input", calc);
+  document.getElementById(id).addEventListener("change", calc);
+});
+
+calc();
+</script>
+</body>
+</html>
